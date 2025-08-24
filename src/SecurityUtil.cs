@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Diagnostics.Contracts;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Soenneker.Security.Util;
 
@@ -49,11 +50,50 @@ public static class SecurityUtil
             CryptographicOperations.ZeroMemory(A);
             CryptographicOperations.ZeroMemory(B);
 
-            if (ap is not null) 
+            if (ap is not null)
                 ArrayPool<byte>.Shared.Return(ap, clearArray: false); // already zeroed
 
             if (bp is not null)
                 ArrayPool<byte>.Shared.Return(bp, clearArray: false);
+        }
+    }
+
+    [Pure]
+    public static bool FixedCostEqualsUtf8(ReadOnlySpan<char> a, ReadOnlySpan<char> b, int paddedLength = 64)
+    {
+        // Encode both to UTF8 into pooled/stack buffers, then call the byte comparer.
+        int aLen = Encoding.UTF8.GetByteCount(a);
+        int bLen = Encoding.UTF8.GetByteCount(b);
+
+        if (aLen > paddedLength || bLen > paddedLength || paddedLength <= 0)
+            return false;
+
+        byte[]? aArr = null, bArr = null;
+
+        Span<byte> A = paddedLength <= _stackLimit ? stackalloc byte[paddedLength] : (aArr = ArrayPool<byte>.Shared.Rent(paddedLength)).AsSpan(0, paddedLength);
+
+        Span<byte> B = paddedLength <= _stackLimit ? stackalloc byte[paddedLength] : (bArr = ArrayPool<byte>.Shared.Rent(paddedLength)).AsSpan(0, paddedLength);
+
+        A.Clear();
+        B.Clear();
+
+        try
+        {
+            Encoding.UTF8.GetBytes(a, A);
+            Encoding.UTF8.GetBytes(b, B);
+
+            return FixedCostEqualsUtf8(A, B, paddedLength);
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(A);
+            CryptographicOperations.ZeroMemory(B);
+
+            if (aArr is not null)
+                ArrayPool<byte>.Shared.Return(aArr, clearArray: false);
+
+            if (bArr is not null)
+                ArrayPool<byte>.Shared.Return(bArr, clearArray: false);
         }
     }
 }
