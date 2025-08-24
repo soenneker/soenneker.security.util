@@ -45,11 +45,6 @@ public static class SecurityUtil
     /// <item><description>
     /// Inputs longer than <paramref name="paddedUtf8Length"/> are rejected immediately as mismatches.
     /// </description></item>
-    /// <item><description>
-    /// For non-secret identifiers (e.g. usernames), consider using a simpler equality
-    /// check or <see cref="CryptographicOperations.FixedTimeEquals(ReadOnlySpan{byte}, ReadOnlySpan{byte})"/>
-    /// when you already have equal-length byte spans.
-    /// </description></item>
     /// </list>
     /// </para>
     /// </remarks>
