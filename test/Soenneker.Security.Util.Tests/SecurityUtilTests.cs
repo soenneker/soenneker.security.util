@@ -1,16 +1,15 @@
-﻿using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Security.Util.Tests;
 
-[Collection("Collection")]
-public sealed class SecurityUtilTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public sealed class SecurityUtilTests : HostedUnitTest
 {
-    public SecurityUtilTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public SecurityUtilTests(Host host) : base(host)
     {
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
