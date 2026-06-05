@@ -58,6 +58,13 @@ public static class SecurityUtil
         }
     }
 
+    /// <summary>
+    /// Executes the fixed cost equals utf8 operation.
+    /// </summary>
+    /// <param name="a">The a.</param>
+    /// <param name="b">The b.</param>
+    /// <param name="paddedLength">The padded length.</param>
+    /// <returns>A value indicating whether the operation succeeded.</returns>
     [Pure]
     public static bool FixedCostEqualsUtf8(ReadOnlySpan<char> a, ReadOnlySpan<char> b, int paddedLength = 64)
     {
