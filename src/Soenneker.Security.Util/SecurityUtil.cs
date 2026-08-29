@@ -14,10 +14,12 @@ public static class SecurityUtil
     private const int _stackLimit = 256;
 
     /// <summary>
-    /// Fixed-cost (O(paddedLength)) comparison of two UTF-8 byte sequences.
-    /// Does not allocate; caller controls the lifetime/zeroing of inputs.
-    /// Returns false if either input exceeds the padded length budget.
+    /// Compares two character sequences as padded UTF-8 data using fixed-cost work.
     /// </summary>
+    /// <param name="aUtf8">A Utf for the fixed cost equals utf operation.</param>
+    /// <param name="bUtf8">B Utf for the fixed cost equals utf operation.</param>
+    /// <param name="paddedLength">Fixed UTF-8 buffer length used for both comparisons.</param>
+    /// <returns>true if fixed-cost (O(paddedLength)) comparison of two UTF-8 byte sequences. Does not allocate; caller controls the lifetime/zeroing of inputs. Returns false if either input exceeds the padded length budget; otherwise, false.</returns>
     [Pure]
     public static bool FixedCostEqualsUtf8(ReadOnlySpan<byte> aUtf8, ReadOnlySpan<byte> bUtf8, int paddedLength = 64)
     {
@@ -59,12 +61,12 @@ public static class SecurityUtil
     }
 
     /// <summary>
-    /// Executes the fixed cost equals utf8 operation.
+    /// Compares two character sequences as padded UTF-8 data using fixed-cost work.
     /// </summary>
-    /// <param name="a">The a.</param>
-    /// <param name="b">The b.</param>
-    /// <param name="paddedLength">The padded length.</param>
-    /// <returns>A value indicating whether the operation succeeded.</returns>
+    /// <param name="a">First character sequence to compare.</param>
+    /// <param name="b">Second character sequence to compare.</param>
+    /// <param name="paddedLength">Fixed UTF-8 buffer length used for both comparisons.</param>
+    /// <returns>true if both UTF-8 representations are equal; otherwise, false.</returns>
     [Pure]
     public static bool FixedCostEqualsUtf8(ReadOnlySpan<char> a, ReadOnlySpan<char> b, int paddedLength = 64)
     {
