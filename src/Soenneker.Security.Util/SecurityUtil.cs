@@ -7,7 +7,7 @@ using System.Text;
 namespace Soenneker.Security.Util;
 
 /// <summary>
-/// A library for various security related utility methods
+/// Provides bounded-work comparisons for UTF-8 secret values.
 /// </summary>
 public static class SecurityUtil
 {
@@ -88,10 +88,10 @@ public static class SecurityUtil
 
         try
         {
-            Encoding.UTF8.GetBytes(a, A);
-            Encoding.UTF8.GetBytes(b, B);
+            int aWritten = Encoding.UTF8.GetBytes(a, A);
+            int bWritten = Encoding.UTF8.GetBytes(b, B);
 
-            return FixedCostEqualsUtf8(A, B, paddedLength);
+            return FixedCostEqualsUtf8(A[..aWritten], B[..bWritten], paddedLength);
         }
         finally
         {

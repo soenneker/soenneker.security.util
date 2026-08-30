@@ -5,31 +5,44 @@
 
 # Soenneker.Security.Util
 
-A library for various security related utility methods.
+Bounded-work equality checks for secrets represented as UTF-8 bytes or characters.
 
-## Install
+## Installation
 
 ```bash
 dotnet add package Soenneker.Security.Util
 ```
 
-## Quick start
+## Byte comparison
 
 ```csharp
 using Soenneker.Security.Util;
 
-var result = SecurityUtil.FixedCostEqualsUtf8(/* supply aUtf8 */ default!, /* supply bUtf8 */ default!);
+bool matches = SecurityUtil.FixedCostEqualsUtf8(
+    suppliedSecretUtf8,
+    expectedSecretUtf8,
+    paddedLength: 128);
 ```
 
-Compares two character sequences as padded UTF-8 data using fixed-cost work.
+The byte overload compares exactly `paddedLength` bytes of zero-padded temporary storage and includes the original byte lengths in the result. It returns `false` when either input exceeds the budget or the budget is not positive.
 
-## What you get
+## Character comparison
 
-- `SecurityUtil` — A library for various security related utility methods.
+```csharp
+bool matches = SecurityUtil.FixedCostEqualsUtf8(
+    suppliedSecret.AsSpan(),
+    expectedSecret.AsSpan(),
+    paddedLength: 128);
+```
 
-## API at a glance
+The character overload encodes both spans as UTF-8, includes their encoded lengths in the comparison, and returns `false` if either encoding exceeds the byte budget. `paddedLength` is a UTF-8 byte count, not a character count.
 
-| API | What it does | Result / important behavior |
-| --- | --- | --- |
-| `SecurityUtil.FixedCostEqualsUtf8(aUtf8, bUtf8, paddedLength)` | Compares two character sequences as padded UTF-8 data using fixed-cost work. | true if fixed-cost (O(paddedLength)) comparison of two UTF-8 byte sequences. Does not allocate; caller controls the lifetime/zeroing of inputs. Returns false if either input exceeds the padded length budget; otherwise, false. |
-| `SecurityUtil.FixedCostEqualsUtf8(a, b, paddedLength)` | Compares two character sequences as padded UTF-8 data using fixed-cost work. | true if both UTF-8 representations are equal; otherwise, false. |
+## Choosing a budget
+
+Use a fixed, trusted budget large enough for every valid value in the credential class you are comparing. Do not derive it from the supplied secret, and do not expose an unbounded caller-controlled value: budgets above 256 bytes rent temporary arrays proportional to the requested size.
+
+The comparison loop performs work based on the fixed budget rather than the location of the first mismatch. Input validation and UTF-8 encoding still depend on input length, so this API should not be described as making the entire surrounding authentication flow constant-time.
+
+Temporary byte buffers are zeroed before return. The input spans are read-only and remain owned by the caller; this utility cannot clear them. Avoid creating immutable secret strings when byte-oriented input is available.
+
+This is an equality primitive, not password hashing. Use a purpose-built password hashing or identity system for user passwords; use fixed-cost equality for already-protected tokens, API keys, signatures, or similar fixed-secret verification where direct equality is appropriate.
