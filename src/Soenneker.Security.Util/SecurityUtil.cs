@@ -42,10 +42,7 @@ public static class SecurityUtil
         try
         {
             // fixed-cost loop over padding
-            for (int i = 0; i < paddedLength; i++)
-                diff |= A[i] ^ B[i];
-
-            return diff == 0;
+            return EqualsPadded(A, B, diff);
         }
         finally
         {
@@ -91,7 +88,7 @@ public static class SecurityUtil
             int aWritten = Encoding.UTF8.GetBytes(a, A);
             int bWritten = Encoding.UTF8.GetBytes(b, B);
 
-            return FixedCostEqualsUtf8(A[..aWritten], B[..bWritten], paddedLength);
+            return EqualsPadded(A, B, aWritten ^ bWritten);
         }
         finally
         {
@@ -105,4 +102,12 @@ public static class SecurityUtil
                 ArrayPool<byte>.Shared.Return(bArr, clearArray: false);
         }
     }
+    private static bool EqualsPadded(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, int diff)
+    {
+        for (int i = 0; i < a.Length; i++)
+            diff |= a[i] ^ b[i];
+
+        return diff == 0;
+    }
+
 }
