@@ -11,7 +11,7 @@ public sealed class SecurityUtilTests : HostedUnitTest
     }
 
     [Test]
-    public async Task Character_comparison_includes_encoded_length()
+    public async ValueTask Character_comparison_includes_encoded_length()
     {
         bool equal = SecurityUtil.FixedCostEqualsUtf8("secret", "secret\0");
 
@@ -19,7 +19,7 @@ public sealed class SecurityUtilTests : HostedUnitTest
     }
 
     [Test]
-    public async Task Equal_unicode_values_match()
+    public async ValueTask Equal_unicode_values_match()
     {
         bool equal = SecurityUtil.FixedCostEqualsUtf8("påssword", "påssword");
 
@@ -27,7 +27,7 @@ public sealed class SecurityUtilTests : HostedUnitTest
     }
 
     [Test]
-    public async Task Values_over_budget_do_not_match()
+    public async ValueTask Values_over_budget_do_not_match()
     {
         bool equal = SecurityUtil.FixedCostEqualsUtf8("12345", "12345", paddedLength: 4);
 
