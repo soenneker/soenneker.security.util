@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Soenneker.Tests.HostedUnit;
+using System.Threading;
 
 namespace Soenneker.Security.Util.Tests;
 
@@ -11,7 +12,7 @@ public sealed class SecurityUtilTests : HostedUnitTest
     }
 
     [Test]
-    public async ValueTask Character_comparison_includes_encoded_length()
+    public async ValueTask Character_comparison_includes_encoded_length(CancellationToken cancellationToken)
     {
         bool equal = SecurityUtil.FixedCostEqualsUtf8("secret", "secret\0");
 
@@ -19,7 +20,7 @@ public sealed class SecurityUtilTests : HostedUnitTest
     }
 
     [Test]
-    public async ValueTask Equal_unicode_values_match()
+    public async ValueTask Equal_unicode_values_match(CancellationToken cancellationToken)
     {
         bool equal = SecurityUtil.FixedCostEqualsUtf8("påssword", "påssword");
 
@@ -27,7 +28,7 @@ public sealed class SecurityUtilTests : HostedUnitTest
     }
 
     [Test]
-    public async ValueTask Values_over_budget_do_not_match()
+    public async ValueTask Values_over_budget_do_not_match(CancellationToken cancellationToken)
     {
         bool equal = SecurityUtil.FixedCostEqualsUtf8("12345", "12345", paddedLength: 4);
 
